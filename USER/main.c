@@ -42,7 +42,7 @@ void usb_port_set(u8 enable)
  int main(void)
  {	
 	unsigned long temp;
-	u16  value[M], i, j, n;
+	u16  value[M], i;
 	 
 	Stm32_Clock_Init(9); //系统时钟设置
 	 
@@ -52,16 +52,9 @@ void usb_port_set(u8 enable)
 	//delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
-	
-	 for (j =0; j< 8; j++) {
-		OLED_WR_Byte(0xb0+j, OLED_CMD);
-		OLED_WR_Byte(0x00, OLED_CMD);
-        OLED_WR_Byte(0x10, OLED_CMD);			
-		
-		for (n = 0; n < 128; n++) {
-	    	OLED_WR_Byte(0xff, OLED_DATA);			
-		}
-	}
+	OLED_ShowString(0,32,"CUIPENG 2015/7/18"); 
+	OLED_Refresh_Gram();
+	 
 	I2C_EE_Init();//温度传感器
 	VOICE_Init();
 	

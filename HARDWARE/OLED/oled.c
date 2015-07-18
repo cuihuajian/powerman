@@ -54,9 +54,7 @@ void OLED_WR_Byte(u8 dat,u8 cmd)
 		OLED_SCLK=0;
 		if(dat&0x80)OLED_SDIN=1;
 		else OLED_SDIN=0;
-		delay_us(100);
 		OLED_SCLK=1;
-		delay_us(100);
 		dat<<=1; 
 	}	 	  
 	OLED_RS=1;   	
@@ -118,14 +116,11 @@ void OLED_ShowChar(u8 x,u8 y,u8 chr,u8 size,u8 mode)
 {      			    
 	u8 temp,t,t1;
 	u8 y0=y;
-	u8 csize=(size/8+((size%8)?1:0))*(size/2);		//得到字体一个字符对应点阵集所占的字节数
-	chr=chr-' ';//得到偏移后的值		 
-    for(t=0;t<csize;t++)
+	chr=chr-' ';//得到偏移后的值				   
+    for(t=0;t<size;t++)
     {   
-		if(size==12)temp=asc2_1206[chr][t]; 	 	//调用1206字体
-		else if(size==16)temp=asc2_1608[chr][t];	//调用1608字体
-		else if(size==24)temp=asc2_2412[chr][t];	//调用2412字体
-		else return;								//没有的字库
+		if(size==12)temp=asc2_1206[chr][t];  //调用1206字体
+		else temp=asc2_1608[chr][t];		 //调用1608字体 	                          
         for(t1=0;t1<8;t1++)
 		{
 			if(temp&0x80)OLED_DrawPoint(x,y,mode);
@@ -175,20 +170,21 @@ void OLED_ShowNum(u8 x,u8 y,u32 num,u8 len,u8 size)
 } 
 //显示字符串
 //x,y:起点坐标  
-//size:字体大小 
-//*p:字符串起始地址 
-void OLED_ShowString(u8 x,u8 y,const u8 *p,u8 size)
-{	
-    while((*p<='~')&&(*p>=' '))//判断是不是非法字符!
+//*p:字符串起始地址
+//用16字体
+void OLED_ShowString(u8 x,u8 y,const u8 *p)
+{
+#define MAX_CHAR_POSX 122
+#define MAX_CHAR_POSY 58          
+    while(*p!='\0')
     {       
-        if(x>(128-(size/2))){x=0;y+=size;}
-        if(y>(64-size)){y=x=0;OLED_Clear();}
-        OLED_ShowChar(x,y,*p,size,1);	 
-        x+=size/2;
+        if(x>MAX_CHAR_POSX){x=0;y+=16;}
+        if(y>MAX_CHAR_POSY){y=x=0;OLED_Clear();}
+        OLED_ShowChar(x,y,*p,16,1);	 
+        x+=8;
         p++;
     }  
-	
-}	
+}
 //初始化SSD1306					    
 void OLED_Init(void)
 { 	 				 	 					    
