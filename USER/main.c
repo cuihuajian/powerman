@@ -73,12 +73,10 @@ void usb_port_set(u8 enable)
 	    temp=temp/((long)65536);
 		temp =temp-((long)4685);
 		
-		//USB_Report();
-		
+		USB_Report();
 		//printf("\ntemp: %d.%d°c \n", (int)temp/100, (int)temp%100);
 
 		filter();
-		
 		for(i=0;i<M;i++) {
 			value[i]= GetVolt(After_filter[i]);
 			printf("value[%d]:%d.%dv\n",i,(int)value[i]/100,(int)value[i]%100) ;
