@@ -19,6 +19,7 @@
 #include "pwm.h"
 #include "voice.h"
 #include "oled.h"
+#include "timer.h"
 
 //设置USB 连接/断线
 //enable:0,断开
@@ -54,9 +55,14 @@ void usb_port_set(u8 enable)
 	OLED_Init();			//初始化液晶 
 	OLED_ShowString(0,32,"CUIPENG 2015/7/18"); 
 	OLED_Refresh_Gram();
-	 
+	
 	I2C_EE_Init();//温度传感器
 	VOICE_Init();
+	
+	//微波控制器
+	TIM3_PWM_Init(65535,0);	//不分频。PWM频率=72000/(479+1)=150Khz
+	TIM_SetCompare3(TIM3,5000);
+	TIM_SetCompare4(TIM3,1000);
 	
  	usb_port_set(0); 	//USB先断开
 	delay_ms(300);
