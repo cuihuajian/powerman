@@ -18,6 +18,7 @@
 #include "adc.h"
 #include "pwm.h"
 #include "voice.h"
+#include "oled.h"
 
 //设置USB 连接/断线
 //enable:0,断开
@@ -41,12 +42,26 @@ void usb_port_set(u8 enable)
  int main(void)
  {	
 	unsigned long temp;
-	u16  value[M], i;
+	u16  value[M], i, j, n;
+	 
+	Stm32_Clock_Init(9); //系统时钟设置
+	 
 	delay_init();	    	 //延时函数初始化	
-    NVIC_Configuration();//中断分组设置	 
+    //NVIC_Configuration();//中断分组设置	 
 	//uart_init(9600);	 	//串口初始化为9600
-	delay_ms(1800);
+	//delay_ms(1800);
 
+	OLED_Init();			//初始化液晶 
+	
+	 for (j =0; j< 8; j++) {
+		OLED_WR_Byte(0xb0+j, OLED_CMD);
+		OLED_WR_Byte(0x00, OLED_CMD);
+        OLED_WR_Byte(0x10, OLED_CMD);			
+		
+		for (n = 0; n < 128; n++) {
+	    	OLED_WR_Byte(0xff, OLED_DATA);			
+		}
+	}
 	I2C_EE_Init();//温度传感器
 	VOICE_Init();
 	

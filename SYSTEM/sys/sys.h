@@ -68,6 +68,6 @@
 
 void NVIC_Configuration(void);
 
-
+void Stm32_Clock_Init(u8 PLL);
 
 #endif
