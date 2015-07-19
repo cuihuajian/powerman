@@ -361,7 +361,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\VOICE;..\HARDWARE\PWM;..\HARDWARE\ADC;..\HARDWARE\HTU21D;..\HARDWARE\OLED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\USB\CONFIG;..\USB\LIB</IncludePath>
+              <IncludePath>..\HARDWARE\TIMER;..\HARDWARE\VOICE;..\HARDWARE\PWM;..\HARDWARE\ADC;..\HARDWARE\HTU21D;..\HARDWARE\OLED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\USB\CONFIG;..\USB\LIB</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -448,6 +448,11 @@
               <FileName>voice.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\VOICE\voice.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\TIMER\timer.c</FilePath>
             </File>
           </Files>
         </Group>
