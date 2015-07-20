@@ -20,13 +20,20 @@
 #include "voice.h"
 #include "oled.h"
 #include "timer.h"
+#include "DataType.h"
+#include "IRDA.H"
 
 //设置USB 连接/断线
 //enable:0,断开
 //       1,允许连接
 extern u16 volatile  AD_Value[N][M]; //用来存放ADC转换结果，也是DMA的目标地址
 extern u16 volatile After_filter[M]; //用来存放求平均值之后的结果
-
+czx_vu8 irda_data[112];
+czx_vu8	STandantdatawang[16]=
+{
+	0xD4,0x01,0x38,0x01,0xD3,0x01,0x36,0x01,
+	0x22,0x01,0x83,0x00,0xB7,0x01,0x37,0x01
+};
 void usb_port_set(u8 enable)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	  	 
@@ -59,6 +66,10 @@ void usb_port_set(u8 enable)
 	I2C_EE_Init();//温度传感器
 	VOICE_Init();
 	
+	//红外控制器
+	IRDA_INIT();
+	IRDA_tx_data(STandantdatawang,sizeof(STandantdatawang));
+
 	//微波控制器
 	TIM3_PWM_Init(65535,0);	//不分频。PWM频率=72000/(479+1)=150Khz
 	TIM_SetCompare3(TIM3,5000);
