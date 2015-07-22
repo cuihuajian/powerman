@@ -22,7 +22,7 @@
 #include "timer.h"
 #include "DataType.h"
 #include "IRDA.H"
-
+extern void IRDA_delay_10us(czx_vu32 t);
 //设置USB 连接/断线
 //enable:0,断开
 //       1,允许连接
@@ -53,22 +53,23 @@ void usb_port_set(u8 enable)
 	u16  value[M], i;
 	 
 	Stm32_Clock_Init(9); //系统时钟设置
+	NVIC_Configuration();//中断分组设置	
 	 
 	delay_init();	    	 //延时函数初始化	
-    //NVIC_Configuration();//中断分组设置	 
+    
 	//uart_init(9600);	 	//串口初始化为9600
-	//delay_ms(1800);
+	delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
 	OLED_ShowString(0,32,"CUIPENG 2015/7/18"); 
 	OLED_Refresh_Gram();
 	
 	I2C_EE_Init();//温度传感器
-	VOICE_Init();
+    VOICE_Init();
 	
 	//红外控制器
 	IRDA_INIT();
-	IRDA_tx_data(STandantdatawang,sizeof(STandantdatawang));
+	IRDA_tx_data(data2,sizeof(data2));
 
 	//微波控制器
 	TIM3_PWM_Init(65535,0);	//不分频。PWM频率=72000/(479+1)=150Khz
@@ -97,8 +98,8 @@ void usb_port_set(u8 enable)
 		temp=((long)17572)*temp;
 	    temp=temp/((long)65536);
 		temp =temp-((long)4685);
-		
-		USB_Report();
+		IRDA_delay_10us(1000);
+		//USB_Report();
 		//printf("\ntemp: %d.%d°c \n", (int)temp/100, (int)temp%100);
 
 		filter();
