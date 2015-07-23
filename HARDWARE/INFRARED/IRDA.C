@@ -27,16 +27,17 @@ czx_vu32 data2[KEY_NUMBS][73]=
 
 czx_vu32	irda_delay_10us	=	FALSE;
 
-void IRDA_GPIO_INIT(void) {
+void IRDA_GPIO_MODE_CHANGE(u32 mode) {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE); 
-      
-    GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_6;
+    
+	GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_6;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
- 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-    GPIO_SetBits(GPIOB,GPIO_Pin_6);
+	GPIO_InitStructure.GPIO_Mode = mode ? GPIO_Mode_AF_PP : GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_SetBits(GPIOB,GPIO_Pin_6);
+	
+	if(!mode) GPIO_ResetBits(GPIOB,GPIO_Pin_6);
 }
 
 void   TIME_INIT(void){//10us÷–∂œ
@@ -64,7 +65,7 @@ void   TIME_INIT(void){//10us÷–∂œ
 
 void IRDA_INIT(void)
 {
-	IRDA_GPIO_INIT();
+	//IRDA_GPIO_INIT();
 	TIME_INIT();
 }
 
@@ -84,12 +85,17 @@ void IRDA_delay_10us(czx_vu32 t){//—” ±10us
 void IRDA_tx_data(czx_vu32 *d,czx_vu32 len)
 {
 	czx_vu32 i = 0;
-	
-	IR_DATA = 1;
-	delay_ms(1);
-	for(i=0;i<len;i++) {
-		IR_DATA = !IR_DATA;
+	for (i = 0;i < len; i++) {
+		if ( i%2 ) {
+			TIM_Cmd(TIM4, DISABLE);
+			IRDA_GPIO_MODE_CHANGE(PWM_DISABLE);	
+		}
+		else {
+			IRDA_GPIO_MODE_CHANGE(PWM_ENABLE);
+			TIM_Cmd(TIM4, ENABLE);			
+		}
 		IRDA_delay_10us(d[i]/10);
 	}
-	IR_DATA = 1;
+	TIM_Cmd(TIM4, DISABLE);
+	IRDA_GPIO_MODE_CHANGE(PWM_DISABLE);
 }

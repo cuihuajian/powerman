@@ -69,6 +69,7 @@ void usb_port_set(u8 enable)
 	
 	//红外控制器
 	IRDA_INIT();
+	TIM4_PWM_Init(946,0);//载波38K
 	IRDA_tx_data(data2[POWER_KEY], KEY_LEN);
 
 	//微波控制器
