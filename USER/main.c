@@ -69,7 +69,7 @@ void usb_port_set(u8 enable)
 	
 	//红外控制器
 	IRDA_INIT();
-	IRDA_tx_data(data2,sizeof(data2));
+	IRDA_tx_data(data2[POWER_KEY], KEY_LEN);
 
 	//微波控制器
 	TIM3_PWM_Init(65535,0);	//不分频。PWM频率=72000/(479+1)=150Khz
