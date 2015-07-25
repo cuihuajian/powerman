@@ -56,7 +56,7 @@ void usb_port_set(u8 enable)
 	 
 	delay_init();	    	 //延时函数初始化	
     //NVIC_Configuration();//中断分组设置	 
-	//uart_init(9600);	 	//串口初始化为9600
+	uart_init(9600);	 	//串口初始化为9600
 	//delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
@@ -64,7 +64,7 @@ void usb_port_set(u8 enable)
 	OLED_Refresh_Gram();
 	
 	I2C_EE_Init();//温度传感器
-	VOICE_Init();
+	//VOICE_Init();
 	
 	//红外控制器
 	IRDA_INIT();

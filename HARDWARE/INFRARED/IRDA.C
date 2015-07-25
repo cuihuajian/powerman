@@ -60,7 +60,7 @@ void   TIME_INIT(void){//10us中断
 	//启动此通道的中断
 	NVIC_Init(&NVIC_InitStructure);
   
-	TIM_Cmd(TIM2,ENABLE);
+	//TIM_Cmd(TIM2,ENABLE);
 }
 
 void IRDA_INIT(void)
@@ -85,6 +85,7 @@ void IRDA_delay_10us(czx_vu32 t){//延时10us
 void IRDA_tx_data(czx_vu32 *d,czx_vu32 len)
 {
 	czx_vu32 i = 0;
+	TIM_Cmd(TIM2,ENABLE);
 	for (i = 0;i < len; i++) {
 		if ( i%2 ) {
 			TIM_Cmd(TIM4, DISABLE);
@@ -96,6 +97,7 @@ void IRDA_tx_data(czx_vu32 *d,czx_vu32 len)
 		}
 		IRDA_delay_10us(d[i]/10);
 	}
+	TIM_Cmd(TIM2, DISABLE);
 	TIM_Cmd(TIM4, DISABLE);
 	IRDA_GPIO_MODE_CHANGE(PWM_DISABLE);
 }
