@@ -22,7 +22,7 @@
 #include "timer.h"
 #include "DataType.h"
 #include "IRDA.H"
-
+int usb_cmd = 0;
 //设置USB 连接/断线
 //enable:0,断开
 //       1,允许连接
@@ -96,7 +96,12 @@ void usb_port_set(u8 enable)
 		
 		USB_Report();
 		DisplayFont_16X16(2,0,64,TEMP);
-
+		
+		if(usb_cmd) {
+			printf("get a usb cmd\n\n");
+		    usb_cmd = 0;
+		}
+		
 		filter();
 		for(i=0;i<M;i++) {
 			value[i]= GetVolt(After_filter[i]);

@@ -46,8 +46,8 @@
 #define JOYSTICK_OFF_HID_DESC                   0x12
 
 #define JOYSTICK_SIZ_DEVICE_DESC                18
-#define JOYSTICK_SIZ_CONFIG_DESC                34
-#define JOYSTICK_SIZ_REPORT_DESC                21
+#define JOYSTICK_SIZ_CONFIG_DESC                41
+#define JOYSTICK_SIZ_REPORT_DESC                39
 #define JOYSTICK_SIZ_STRING_LANGID              4
 #define JOYSTICK_SIZ_STRING_VENDOR              26
 #define JOYSTICK_SIZ_STRING_PRODUCT             34

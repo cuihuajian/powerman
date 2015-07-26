@@ -88,7 +88,7 @@ const uint8_t Joystick_ConfigDescriptor[JOYSTICK_SIZ_CONFIG_DESC] =
     USB_INTERFACE_DESCRIPTOR_TYPE,/*bDescriptorType: Interface descriptor type*/
     0x00,         /*bInterfaceNumber: Number of Interface*/
     0x00,         /*bAlternateSetting: Alternate setting*/
-    0x01,         /*bNumEndpoints*/
+    0x02,         /*bNumEndpoints*/
     0x03,         /*bInterfaceClass: HID*/
     0x00,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
     0x00,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
@@ -97,7 +97,7 @@ const uint8_t Joystick_ConfigDescriptor[JOYSTICK_SIZ_CONFIG_DESC] =
     /* 18 */
     0x09,         /*bLength: HID Descriptor size*/
     HID_DESCRIPTOR_TYPE, /*bDescriptorType: HID*/
-    0x00,         /*bcdHID: HID Class Spec release number*/
+    0x10,         /*bcdHID: HID Class Spec release number*/
     0x01,
     0x00,         /*bCountryCode: Hardware target country*/
     0x01,         /*bNumDescriptors: Number of HID class descriptors to follow*/
@@ -115,28 +115,43 @@ const uint8_t Joystick_ConfigDescriptor[JOYSTICK_SIZ_CONFIG_DESC] =
     0x00,
     0x20,          /*bInterval: Polling Interval (32 ms)*/
     /* 34 */
+	0x07,      /* bLength: Endpoint Descriptor size */
+    USB_ENDPOINT_DESCRIPTOR_TYPE,   /* bDescriptorType: */
+                     /*    Endpoint descriptor type */
+    0x02,      /* bEndpointAddress: */
+                     /*    Endpoint Address (OUT) */
+    0x03,      /* bmAttributes: Interrupt endpoint */
+    0x02,//0x02,   /* wMaxPacketSize: 20 Bytes max  */
+    0x00,
+    0x10,   
   }
   ; /* MOUSE_ConfigDescriptor */
 const uint8_t Joystick_ReportDescriptor[JOYSTICK_SIZ_REPORT_DESC] =
   {
-	0x05, 0x8c, /* USAGE_PAGE (ST Page) */ 
-	0x09, 0x01, /* USAGE (Demo Kit) */   
-	  
-    0xA1,0x01,          /*Collection(Logical)*/
-    
+	0x05, 0xff, /* USAGE_PAGE (ST Page) */ 
+	0x09, 0xff, /* USAGE (Demo Kit) */
+    0xA1, 0x01, /*Collection(Logical)*/
+    // The Input report	
+    0x05, 0x01,                      // USAGE_PAGE(1)
     0x15, 0x00,         //LOGICAL_MINIMUM (0)
     0x25, 0xFF,         //LOGICAL_MAXIMUM (255)
-	  
-    0x19, 0x01,         //USAGE_MINIMUM (1)	  
-	0x29, 0x02,         //USAGE_MAXIMUM (8) 
-    
+    0x19, 0x00,         //USAGE_MINIMUM (1)	  
+	0x29, 0xff,         //USAGE_MAXIMUM (8) 
     /* 24 */
     0x95,0x23,          //REPORT_COUNT (8)
     0x75,0x08,          //REPORT_SIZE (8)
-   
     0x81,0x02,         //INPUT (Data,Var,Abs)
-  
-    0xc0
+    // The Output report
+    0x05, 0x02,                      // USAGE_PAGE(2)
+    0x19, 0x00,                      //   USAGE_MINIMUM (0)
+    0x29, 0xFF,                      //   USAGE_MAXIMUM (255)
+    0x15, 0x00,                      //   LOGICAL_MINIMUM (0)
+    0x25, 0xFF,                      //   LOGICAL_MAXIMUM (255)
+    0x95, 0x01,                      //   REPORT_SIZE (8)
+    0x75, 0x08,                      //   REPORT_COUNT (64) ---PC Read/Write TAG+63BYTE        =64Byte
+    0x91, 0x02,                      //   OUTPUT (Data,Var,Abs)
+    
+	0xc0
   }
   ; /* Joystick_ReportDescriptor */
 
