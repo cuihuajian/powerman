@@ -29,11 +29,7 @@
 extern u16 volatile  AD_Value[N][M]; //用来存放ADC转换结果，也是DMA的目标地址
 extern u16 volatile After_filter[M]; //用来存放求平均值之后的结果
 czx_vu8 irda_data[112];
-czx_vu8	STandantdatawang[16]=
-{
-	0xD4,0x01,0x38,0x01,0xD3,0x01,0x36,0x01,
-	0x22,0x01,0x83,0x00,0xB7,0x01,0x37,0x01
-};
+
 void usb_port_set(u8 enable)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	  	 
@@ -60,8 +56,7 @@ void usb_port_set(u8 enable)
 	//delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
-	OLED_ShowString(0,32,"CUIPENG 2015/7/18"); 
-	OLED_Refresh_Gram();
+	DisplayFont_16X16(0,0,192,ASWE);
 	
 	I2C_EE_Init();//温度传感器
 	//VOICE_Init();
@@ -100,7 +95,7 @@ void usb_port_set(u8 enable)
 		temp =temp-((long)4685);
 		
 		USB_Report();
-		//printf("\ntemp: %d.%d°c \n", (int)temp/100, (int)temp%100);
+		DisplayFont_16X16(2,0,64,TEMP);
 
 		filter();
 		for(i=0;i<M;i++) {

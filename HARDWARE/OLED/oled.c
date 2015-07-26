@@ -1,6 +1,6 @@
 #include "oled.h"
 #include "stdlib.h"
-#include "oledfont.h"  	 
+#include "FONT.H"  	 
 #include "delay.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -15,33 +15,7 @@
 //Copyright(C) 正点原子 2009-2019
 //All rights reserved
 ////////////////////////////////////////////////////////////////////////////////// 	  
- 
-
-//OLED的显存
-//存放格式如下.
-//[0]0 1 2 3 ... 127	
-//[1]0 1 2 3 ... 127	
-//[2]0 1 2 3 ... 127	
-//[3]0 1 2 3 ... 127	
-//[4]0 1 2 3 ... 127	
-//[5]0 1 2 3 ... 127	
-//[6]0 1 2 3 ... 127	
-//[7]0 1 2 3 ... 127 		   
-u8 OLED_GRAM[128][8];	 
-
-//更新显存到LCD		 
-void OLED_Refresh_Gram(void)
-{
-	u8 i,n;		    
-	for(i=0;i<8;i++)  
-	{  
-		OLED_WR_Byte (0xb0+i,OLED_CMD);    //设置页地址（0~7）
-		OLED_WR_Byte (0x00,OLED_CMD);      //设置显示位置—列低地址
-		OLED_WR_Byte (0x10,OLED_CMD);      //设置显示位置—列高地址   
-		for(n=0;n<128;n++)OLED_WR_Byte(OLED_GRAM[n][i],OLED_DATA); 
-	}   
-}
-
+	
 //向SSD1306写入一个字节。
 //dat:要写入的数据/命令
 //cmd:数据/命令标志 0,表示命令;1,表示数据;
@@ -60,131 +34,99 @@ void OLED_WR_Byte(u8 dat,u8 cmd)
 	OLED_RS=1;   	
 }
 
-//开启OLED显示    
-void OLED_Display_On(void)
+void DisplayChar_16X08(uchar x,uchar y,uchar *dispdata)
 {
-	OLED_WR_Byte(0X8D,OLED_CMD);  //SET DCDC命令
-	OLED_WR_Byte(0X14,OLED_CMD);  //DCDC ON
-	OLED_WR_Byte(0XAF,OLED_CMD);  //DISPLAY ON
-}
-//关闭OLED显示     
-void OLED_Display_Off(void)
-{
-	OLED_WR_Byte(0X8D,OLED_CMD);  //SET DCDC命令
-	OLED_WR_Byte(0X10,OLED_CMD);  //DCDC OFF
-	OLED_WR_Byte(0XAE,OLED_CMD);  //DISPLAY OFF
-}		   			 
-//清屏函数,清完屏,整个屏幕是黑色的!和没点亮一样!!!	  
-void OLED_Clear(void)  
-{  
-	u8 i,n;  
-	for(i=0;i<8;i++)for(n=0;n<128;n++)OLED_GRAM[n][i]=0X00;  
-	OLED_Refresh_Gram();//更新显示
-}
-//画点 
-//x:0~127
-//y:0~63
-//t:1 填充 0,清空				   
-void OLED_DrawPoint(u8 x,u8 y,u8 t)
-{
-	u8 pos,bx,temp=0;
-	if(x>127||y>63)return;//超出范围了.
-	pos=7-y/8;
-	bx=y%8;
-	temp=1<<(7-bx);
-	if(t)OLED_GRAM[x][pos]|=temp;
-	else OLED_GRAM[x][pos]&=~temp;	    
-}
-//x1,y1,x2,y2 填充区域的对角坐标
-//确保x1<=x2;y1<=y2 0<=x1<=127 0<=y1<=63	 	 
-//dot:0,清空;1,填充	  
-void OLED_Fill(u8 x1,u8 y1,u8 x2,u8 y2,u8 dot)  
-{  
-	u8 x,y;  
-	for(x=x1;x<=x2;x++)
+	uchar i,j,fontposition,addyl,addyh;
+	uchar *databuf;
+
+	while((*dispdata)!=0)
 	{
-		for(y=y1;y<=y2;y++)OLED_DrawPoint(x,y,dot);
-	}													    
-	OLED_Refresh_Gram();//更新显示
-}
-//在指定位置显示一个字符,包括部分字符
-//x:0~127
-//y:0~63
-//mode:0,反白显示;1,正常显示				 
-//size:选择字体 16/12 
-void OLED_ShowChar(u8 x,u8 y,u8 chr,u8 size,u8 mode)
-{      			    
-	u8 temp,t,t1;
-	u8 y0=y;
-	chr=chr-' ';//得到偏移后的值				   
-    for(t=0;t<size;t++)
-    {   
-		if(size==12)temp=asc2_1206[chr][t];  //调用1206字体
-		else temp=asc2_1608[chr][t];		 //调用1608字体 	                          
-        for(t1=0;t1<8;t1++)
+//		if((y>127)||(x>7))	 break;						//判断字符显示的位置是否超出范围
+			
+		/*获取字符在字库中的位置*/
+		fontposition=*dispdata-0x20;					//计算字符在字库中的位置
+		databuf=(uchar *)(ASCII_1608+fontposition);
+		
+		/*计算当前字符显示的起始列地址*/
+		addyl=y%16;										//计算列低地址
+		addyh=y/16+0x10;								//计算列高地址
+
+		/*显示字符*/		
+		for(i=0;i<2;i++)
 		{
-			if(temp&0x80)OLED_DrawPoint(x,y,mode);
-			else OLED_DrawPoint(x,y,!mode);
-			temp<<=1;
-			y++;
-			if((y-y0)==size)
+			OLED_WR_Byte(0xb0+x+i,OLED_CMD);			//设置页地址
+			OLED_WR_Byte(addyl,OLED_CMD);				//设置列低地址
+			OLED_WR_Byte(addyh,OLED_CMD);				//设置列高地址
+
+			for(j=0;j<8;j++)
 			{
-				y=y0;
-				x++;
-				break;
-			}
-		}  	 
-    }          
-}
-//m^n函数
-u32 mypow(u8 m,u8 n)
-{
-	u32 result=1;	 
-	while(n--)result*=m;    
-	return result;
-}				  
-//显示2个数字
-//x,y :起点坐标	 
-//len :数字的位数
-//size:字体大小
-//mode:模式	0,填充模式;1,叠加模式
-//num:数值(0~4294967295);	 		  
-void OLED_ShowNum(u8 x,u8 y,u32 num,u8 len,u8 size)
-{         	
-	u8 t,temp;
-	u8 enshow=0;						   
-	for(t=0;t<len;t++)
-	{
-		temp=(num/mypow(10,len-t-1))%10;
-		if(enshow==0&&t<(len-1))
-		{
-			if(temp==0)
-			{
-				OLED_ShowChar(x+(size/2)*t,y,' ',size,1);
-				continue;
-			}else enshow=1; 
-		 	 
+				OLED_WR_Byte(*(databuf++),OLED_DATA);	
+			}  			
 		}
-	 	OLED_ShowChar(x+(size/2)*t,y,temp+'0',size,1); 
-	}
-} 
-//显示字符串
-//x,y:起点坐标  
-//*p:字符串起始地址
-//用16字体
-void OLED_ShowString(u8 x,u8 y,const u8 *p)
-{
-#define MAX_CHAR_POSX 122
-#define MAX_CHAR_POSY 58          
-    while(*p!='\0')
-    {       
-        if(x>MAX_CHAR_POSX){x=0;y+=16;}
-        if(y>MAX_CHAR_POSY){y=x=0;OLED_Clear();}
-        OLED_ShowChar(x,y,*p,16,1);	 
-        x+=8;
-        p++;
-    }  
+
+		y+=8;											//列地址自加6
+		dispdata++;
+	}		
 }
+
+/*****************************************************
+** 函数名称：DisplayFont_16X16
+** 函数功能：显示16*16点阵（本例程主要用来显示已经取模的汉字点阵）
+** 参    数：1.x: 字符串显示的起始页地址
+			 2.y：字符串显示的起始列地址
+			 3.len：点阵数据长度
+			 4.*dispdata：指向需要显示的点阵数据指针
+** 函数返回：无
+** 编写作者：326电子工作室
+** 编写时间：2015年5月19日
+** 网    址：  ttsemb.taobao.com
+** 技术支持群：QQ427165833
+******************************************************/
+void DisplayFont_16X16(uchar x,uchar y,uint len,uchar *dispdata)
+{
+	uchar i,j,z,count,addyl,addyh;	
+
+ 	count=len/32;
+
+	for(z=0;z<count;z++)
+	{
+		/*计算当前点阵显示的起始列地址*/
+		addyl=y%16;										//计算列低地址
+		addyh=y/16+0x10;
+
+		/*显示16*16点阵数据*/
+		for(i=0;i<2;i++)
+		{
+			OLED_WR_Byte(0xb0+x+i,OLED_CMD);			//设置页地址
+			OLED_WR_Byte(addyl,OLED_CMD);				//设置列低地址
+			OLED_WR_Byte(addyh,OLED_CMD);				//设置列高地址
+			for(j=0;j<16;j++)
+			{
+				OLED_WR_Byte(*(dispdata++),OLED_DATA);	
+			}
+		}	
+		y+=16;		
+	}	
+}
+
+void OledClearn(void)
+{
+	uchar i,j;
+
+	for(i=0;i<8;i++)
+	{
+		OLED_WR_Byte(0xb0+i,OLED_CMD);				//设置页地址
+		OLED_WR_Byte(0x00,OLED_CMD);				//设置列低地址
+		OLED_WR_Byte(0x10,OLED_CMD);				//设置列高地址
+
+		for(j=0;j<128;j++)
+		{
+			OLED_WR_Byte(0x00,OLED_DATA);
+		}
+
+	}
+}
+
 //初始化SSD1306					    
 void OLED_Init(void)
 { 	 				 	 					    
@@ -195,46 +137,65 @@ void OLED_Init(void)
 	GPIOB->ODR |= 0XE000;				//置1 PB12/PB13 
 								  
 	//OLED_RST=0;
-	delay_ms(3000);
+	delay_ms(1000);
 	//OLED_RST=1; 
+	/*关闭OLED显示*/
+	OLED_WR_Byte(SET_DISPLAY_OFF,OLED_CMD);
+	
+	/*设置正当频率、时钟分频因子*/
+    OLED_WR_Byte(SET_DISPLAY_CLOCK,OLED_CMD);
+    OLED_WR_Byte(0x80,OLED_CMD);
+		
+	/*设置驱动路数*/
+	OLED_WR_Byte(SET_MULTIPLEX_RATIO,OLED_CMD);			  //驱动路数设置命令
+	OLED_WR_Byte(0x1F,OLED_CMD);							  //驱动路数值(1/32)
 
-	OLED_WR_Byte(0xAE,OLED_CMD);
+	/*设置行显示偏移*/
+	OLED_WR_Byte(SET_DISPLAY_OFFSET,OLED_CMD);				  //显示偏移设置命令
+	OLED_WR_Byte(0x00,OLED_CMD);							  //取值范围：0x00-->0x3F
+
+	/*设置显示起始行*/
+	OLED_WR_Byte(0x40,OLED_CMD);							  //取值范围：0x40---0x7F
 	
-    OLED_WR_Byte(0xD5,OLED_CMD);
-    OLED_WR_Byte(0x80,OLED_CMD);	
+	/*设置电荷泵*/
+	OLED_WR_Byte(CHARGE_PUMP_SET,OLED_CMD); 				  //电荷泵设置命令
+	OLED_WR_Byte(0x14,OLED_CMD);							  //开启电荷泵
+
+	/*设置内存地址模式*/
+	OLED_WR_Byte(SET_MEMORY_ADDR_MODE,OLED_CMD);			  //内存地址模式设置命令
+	OLED_WR_Byte(0x10,OLED_CMD);							  //设置地址模式值：0x00,列地址模式；0x01,行地址模式；
+															  //0x10，页地址模式；
+	/*设置列地址映射*/										  
+	OLED_WR_Byte(SET_SEGMENT_REMAP_A1,OLED_CMD); 			  //列地址0映射到SEG127
+
+	/*设置行地址映射*/
+	OLED_WR_Byte(SET_COM_SCAN_DIRECTION_C8,OLED_CMD); 		  //行地址0映射到COM63
 	
-	OLED_WR_Byte(0xA8,OLED_CMD);
-	OLED_WR_Byte(0x1F,OLED_CMD);
+	/*设置COM硬件引脚配置*/									  
+	OLED_WR_Byte(SET_COM_PINS_CONFIG,OLED_CMD); 			  //设置COM硬件引脚配置命令
+	OLED_WR_Byte(0x00,OLED_CMD); 
+
+	/*对比度设置*/
+	OLED_WR_Byte(SET_CONTRAST_CONTROL,OLED_CMD); 			   //对比度设置命令
+	OLED_WR_Byte(0x8F,OLED_CMD); 							   //对比度值，取值范围1-255
 	
-	OLED_WR_Byte(0xD3,OLED_CMD);
-	OLED_WR_Byte(0x00,OLED_CMD);
-	
-	OLED_WR_Byte(0x40,OLED_CMD);
-	
-	OLED_WR_Byte(0x8D,OLED_CMD); //电荷泵设置
-	OLED_WR_Byte(0x14,OLED_CMD);
-	
-	OLED_WR_Byte(0xA1,OLED_CMD); 
-	
-	OLED_WR_Byte(0xC0,OLED_CMD); 
-	
-	OLED_WR_Byte(0xDA,OLED_CMD); 
-	OLED_WR_Byte(0x02,OLED_CMD); 
-	
-	OLED_WR_Byte(0x81,OLED_CMD); 
-	OLED_WR_Byte(0x8F,OLED_CMD); 
-	
-	OLED_WR_Byte(0xD9,OLED_CMD); 
+	/*设置预充电周期*/
+	OLED_WR_Byte(SET_PRECHARGE_PERIOD,OLED_CMD); 
 	OLED_WR_Byte(0xF1,OLED_CMD); 
 	
-	OLED_WR_Byte(0xDB,OLED_CMD); 
-	OLED_WR_Byte(0x40,OLED_CMD);
+	/*设置VCOMH电源倍率*/
+	OLED_WR_Byte(SET_VCOMH_DESELECT_L,OLED_CMD); 
+	OLED_WR_Byte(0x00,OLED_CMD);
+
+	/*关闭全局显示*/
+    OLED_WR_Byte(ENTIRE_DISPLAY_ON_A4,OLED_CMD); 
+
+	/*设置OLED点亮方式*/
+	OLED_WR_Byte(NORMAL_DISPLAY,OLED_CMD); 	 				//0：熄灭像素；1：点亮像素
+
+	/*打开OLED显示*/
+	OLED_WR_Byte(SET_DISPLAY_ON,OLED_CMD); 
 	
-    OLED_WR_Byte(0xA4,OLED_CMD); 
-	
-	OLED_WR_Byte(0xA6,OLED_CMD); 
-	
-	OLED_Clear();
-	
-	OLED_WR_Byte(0xAF,OLED_CMD); 
+	/*清屏操作*/
+	OledClearn();
 }
