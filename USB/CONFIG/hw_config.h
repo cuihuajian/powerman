@@ -58,6 +58,7 @@ void USB_Report(void);
 uint8_t JoyState(void);
 void Get_SerialNum(void);
 extern uint8_t USB_Frame[35];
+extern uint8_t USB_DOWN[2];
 void USB_Report_init(void);
 
 #endif  /*__HW_CONFIG_H*/

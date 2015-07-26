@@ -22,6 +22,8 @@
 #include "timer.h"
 #include "DataType.h"
 #include "IRDA.H"
+#include "skyworth.h"
+
 int usb_cmd = 0;
 //设置USB 连接/断线
 //enable:0,断开
@@ -64,7 +66,6 @@ void usb_port_set(u8 enable)
 	//红外控制器
 	IRDA_INIT();
 	TIM4_PWM_Init(946,0);//载波38K
-	IRDA_tx_data(data2[POWER_KEY], KEY_LEN);
 
 	//微波控制器
 	TIM3_PWM_Init(65535,0);	//不分频。PWM频率=72000/(479+1)=150Khz
@@ -98,7 +99,7 @@ void usb_port_set(u8 enable)
 		DisplayFont_16X16(2,0,64,TEMP);
 		
 		if(usb_cmd) {
-			printf("get a usb cmd\n\n");
+			IRDA_tx_data(skyworth[USB_DOWN[0]], SKY_WORTH_KEY_LEN);
 		    usb_cmd = 0;
 		}
 		

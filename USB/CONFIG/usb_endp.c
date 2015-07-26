@@ -61,7 +61,7 @@ void EP2_OUT_Callback(void)
   DataLen = GetEPRxCount(ENDP2);
   PMAToUserBufferCopy(USB_DOWN, ENDP2_RXADDR, DataLen);
   SetEPRxValid(ENDP2);
-  usb_cmd = 1;
+  usb_cmd = DataLen;
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
