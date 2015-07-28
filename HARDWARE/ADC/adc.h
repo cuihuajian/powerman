@@ -15,6 +15,8 @@
 #define N 50 //每通道采50次
 #define M 2 //为12个通道
 
+#define LIGHT 0
+
 void Adc_Init(void);
 void filter(void);
 u16 GetVolt(u16 advalue);

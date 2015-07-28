@@ -34,6 +34,56 @@ void OLED_WR_Byte(u8 dat,u8 cmd)
 	OLED_RS=1;   	
 }
 
+u32 Pow(u32 num,uchar count)
+{
+	uchar i;
+	u32 result = 0;
+	if(count == 0)
+	{
+		num = 1;
+		return num;
+	}
+	else
+	{
+		result = num;
+		for(i = 0;i<count-1;i++)
+		{
+			result *= num;	
+		}
+	}
+	return result;
+}
+
+#define NUM_TO_CHAR	0x30
+
+void NumToString(u32 num,uchar numbit,uchar *string)
+{
+	uchar i=0,z=0;
+	u32 temp = 0;
+	uchar changestart = 0;
+	uchar j = numbit-1;
+
+	for(i = 0;i<numbit;i++)
+	{
+		temp = num/Pow(10,j);
+
+		if(changestart)
+		{
+			string[z++] = temp+NUM_TO_CHAR;
+		}
+		if((temp>0)&&(changestart == 0))
+		{
+			string[z++] = temp+NUM_TO_CHAR;	
+			changestart = 1;
+		}
+
+		temp = Pow(10,j);
+		num %= temp;
+		j--;
+	}
+	string[z] = 0;
+}
+
 void DisplayChar_16X08(uchar x,uchar y,uchar *dispdata)
 {
 	uchar i,j,fontposition,addyl,addyh;

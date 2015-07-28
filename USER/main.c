@@ -23,7 +23,7 @@
 #include "DataType.h"
 #include "IRDA.H"
 #include "skyworth.h"
-
+unsigned long temp, humi;
 int usb_cmd = 0;
 //设置USB 连接/断线
 //enable:0,断开
@@ -47,9 +47,8 @@ void usb_port_set(u8 enable)
 
  int main(void)
  {	
-	unsigned long temp;
 	u16  value[M], i;
-	 
+	u8 disp[4];
 	Stm32_Clock_Init(9); //系统时钟设置
 	 
 	delay_init();	    	 //延时函数初始化	
@@ -58,7 +57,9 @@ void usb_port_set(u8 enable)
 	//delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
-	DisplayFont_16X16(0,0,192,ASWE);
+	DisplayFont_16X16(0,0,64,TEMP);
+	DisplayFont_16X16(0,48,64,HUMI);
+	DisplayFont_16X16(2,0,64,LIGH);
 	
 	I2C_EE_Init();//温度传感器
 	//VOICE_Init();
@@ -90,13 +91,15 @@ void usb_port_set(u8 enable)
 	{
 		delay_ms(1000);
 		
-		temp = Htu21D_read();
+		temp = Htu21D_read(HTU21_RD_TEMP);
 		temp=((long)17572)*temp;
 	    temp=temp/((long)65536);
 		temp =temp-((long)4685);
 		
-		USB_Report();
-		DisplayFont_16X16(2,0,64,TEMP);
+		humi = Htu21D_read(HTU21_RD_HUMI);
+		humi=((long)12500)*humi;
+		humi=humi/((long)65536);
+		humi =humi-((long)600);
 		
 		if(usb_cmd) {
 			IRDA_tx_data(skyworth[USB_DOWN[0]], SKY_WORTH_KEY_LEN);
@@ -110,7 +113,17 @@ void usb_port_set(u8 enable)
 		delay_ms(100);
 		}
 		
-		//OLED_ShowString(0,52,"hello:",12);  
+		//显示温度、湿度
+		NumToString((int)temp/100, 2, disp);
+		DisplayChar_16X08(0, 32,disp);
+		NumToString((int)humi/100, 2, disp);
+		DisplayChar_16X08(0, 80,disp);
+		
+		//显示亮度
+		NumToString((int)value[0]*3, 3, disp);
+		DisplayChar_16X08(2, 32,disp);	
+
+		USB_Report();
 	}
  }
 

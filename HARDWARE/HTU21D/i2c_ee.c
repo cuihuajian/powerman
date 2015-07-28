@@ -94,7 +94,7 @@ void I2C_EE_Init(void)
  * 返回  ：无
  * 调用  ：外部调用
  */
-u16 Htu21D_read(void)
+u16 Htu21D_read(u8 cmd)
 {  
   u8 value[2];
 	

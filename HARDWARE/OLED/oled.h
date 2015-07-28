@@ -78,11 +78,14 @@ void OLED_Init(void);
 void OLED_Clear(void);
 void DisplayFont_16X16(uchar x,uchar y,uint len,uchar *dispdata);
 void DisplayChar_16X08(uchar x,uchar y,uchar *dispdata);
-
+void NumToString(u32 num,uchar numbit,uchar *string);
+void OledHorizontalDisplay(uchar direction,uchar startpage,uchar endpage,uchar interval);
 extern  unsigned char  asc2_1206[95][12];
 extern  unsigned char  asc2_1608[95][16];
 extern  unsigned char  ASWE[192];
 extern  unsigned char  TEMP[64];
+extern  unsigned char  HUMI[64];
+extern  unsigned char  LIGH[64];
 extern  unsigned char  Table3[106];
 extern  unsigned char  Table4[256];
 extern  unsigned char  Table5[256];
