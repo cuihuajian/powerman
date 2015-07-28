@@ -67,8 +67,8 @@ void usb_port_set(u8 enable)
 
 	//微波控制器
 	TIM3_PWM_Init(65535,0);	//不分频。PWM频率=72000/(479+1)=150Khz
-	TIM_SetCompare3(TIM3,5000);
-	TIM_SetCompare4(TIM3,1000);
+	TIM_SetCompare3(TIM3,600);
+	TIM_SetCompare4(TIM3,250);
 	
  	usb_port_set(0); 	//USB先断开
 	delay_ms(300);
