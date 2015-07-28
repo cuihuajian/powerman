@@ -57,9 +57,6 @@ void usb_port_set(u8 enable)
 	//delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
-	DisplayFont_16X16(0,0,64,TEMP);
-	DisplayFont_16X16(0,48,64,HUMI);
-	DisplayFont_16X16(2,0,64,LIGH);
 	
 	I2C_EE_Init();//温度传感器
 	//VOICE_Init();
@@ -113,6 +110,10 @@ void usb_port_set(u8 enable)
 		delay_ms(100);
 		}
 		
+		OledClearn();
+		DisplayFont_16X16(0,0,64,TEMP);
+		DisplayFont_16X16(0,48,64,HUMI);
+		DisplayFont_16X16(2,0,64,LIGH);
 		//显示温度、湿度
 		NumToString((int)temp/100, 2, disp);
 		DisplayChar_16X08(0, 32,disp);
@@ -121,8 +122,8 @@ void usb_port_set(u8 enable)
 		
 		//显示亮度
 		NumToString((int)value[0]*3, 3, disp);
-		DisplayChar_16X08(2, 32,"  ");
 		DisplayChar_16X08(2, 32,disp);
+		
 		printf("light %d\n\n", (int)value[0]*3);
 
 		USB_Report();

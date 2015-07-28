@@ -52,7 +52,7 @@ void  Adc_Init(void)
 
 	
 	//PA1 作为模拟通道输入引脚                         
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_7|GPIO_Pin_4;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;		//模拟输入引脚
 	GPIO_Init(GPIOA, &GPIO_InitStructure);	
 
@@ -77,6 +77,7 @@ void  Adc_Init(void)
 	ADC_Cmd(ADC1, ENABLE);	//使能指定的ADC1
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 1, ADC_SampleTime_239Cycles5 );
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 2, ADC_SampleTime_239Cycles5 );
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SampleTime_239Cycles5 );
 	ADC_ResetCalibration(ADC1);	//使能复位校准  
 	 
 	while(ADC_GetResetCalibrationStatus(ADC1));	//等待复位校准结束

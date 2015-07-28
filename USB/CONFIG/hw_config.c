@@ -167,6 +167,7 @@ void USB_Report_init(void)
 
 void USB_Report(void)
 {   
+	
 	/* Copy mouse position info in ENDP1 Tx Packet Memory Area*/
 	USB_SIL_Write(EP1_IN, USB_Frame, 35); 
 	/* Enable endpoint for transmission */

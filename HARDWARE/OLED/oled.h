@@ -72,8 +72,8 @@ typedef unsigned int uint;
 void OLED_WR_Byte(u8 dat,u8 cmd);	    
 void OLED_Display_On(void);
 void OLED_Display_Off(void);
-void OLED_Refresh_Gram(void);		   
-							   		    
+void OLED_Refresh_Gram(void);   
+void OledClearn(void);
 void OLED_Init(void);
 void OLED_Clear(void);
 void DisplayFont_16X16(uchar x,uchar y,uint len,uchar *dispdata);
