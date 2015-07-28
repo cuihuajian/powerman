@@ -121,7 +121,9 @@ void usb_port_set(u8 enable)
 		
 		//显示亮度
 		NumToString((int)value[0]*3, 3, disp);
-		DisplayChar_16X08(2, 32,disp);	
+		DisplayChar_16X08(2, 32,"  ");
+		DisplayChar_16X08(2, 32,disp);
+		printf("light %d\n\n", (int)value[0]*3);
 
 		USB_Report();
 	}
