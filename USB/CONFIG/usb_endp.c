@@ -57,7 +57,7 @@ extern int usb_cmd;
 void EP2_OUT_Callback(void)
 {
   u8 DataLen;
-
+  USB_DOWN[0] = 0;
   DataLen = GetEPRxCount(ENDP2);
   PMAToUserBufferCopy(USB_DOWN, ENDP2_RXADDR, DataLen);
   SetEPRxValid(ENDP2);

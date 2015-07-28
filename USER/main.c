@@ -67,8 +67,8 @@ void usb_port_set(u8 enable)
 
 	//微波控制器
 	TIM3_PWM_Init(65535,0);	//不分频。PWM频率=72000/(479+1)=150Khz
-	TIM_SetCompare3(TIM3,600);
-	TIM_SetCompare4(TIM3,250);
+	TIM_SetCompare3(TIM3,10000);
+	TIM_SetCompare4(TIM3,4200);
 	
  	usb_port_set(0); 	//USB先断开
 	delay_ms(300);
@@ -99,7 +99,8 @@ void usb_port_set(u8 enable)
 		humi =humi-((long)600);
 		
 		if(usb_cmd) {
-			IRDA_tx_data(skyworth[USB_DOWN[0]], SKY_WORTH_KEY_LEN);
+			printf("usb cmd %d\n\n", USB_DOWN[0] - '0');
+			IRDA_tx_data(skyworth[USB_DOWN[0] - '0'], SKY_WORTH_KEY_LEN);
 		    usb_cmd = 0;
 		}
 		
