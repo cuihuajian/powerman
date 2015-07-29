@@ -56,6 +56,21 @@ u32 Pow(u32 num,uchar count)
 
 #define NUM_TO_CHAR	0x30
 
+void NumToStringForUsb(u32 num,uchar numbit,uchar *string)
+{
+	uchar i=0,z=0;
+	u32 temp = 0;
+	uchar j = numbit-1;
+
+	for(i = 0;i<numbit;i++) {
+		temp = num/Pow(10,j);
+		string[z++] = temp+NUM_TO_CHAR;	
+		temp = Pow(10,j);
+		num %= temp;
+		j--;
+	}
+}
+
 void NumToString(u32 num,uchar numbit,uchar *string)
 {
 	uchar i=0,z=0;

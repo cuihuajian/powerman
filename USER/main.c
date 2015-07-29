@@ -88,27 +88,51 @@ void usb_port_set(u8 enable)
 	{
 		delay_ms(1000);
 		
-		temp = Htu21D_read(HTU21_RD_TEMP);
-		temp=((long)17572)*temp;
-	    temp=temp/((long)65536);
-		temp =temp-((long)4685);
-		
-		humi = Htu21D_read(HTU21_RD_HUMI);
-		humi=((long)12500)*humi;
-		humi=humi/((long)65536);
-		humi =humi-((long)600);
-		
-		if(usb_cmd) {
-			printf("usb cmd %d\n\n", USB_DOWN[0] - '0');
-			IRDA_tx_data(skyworth[USB_DOWN[0] - '0'], SKY_WORTH_KEY_LEN);
-		    usb_cmd = 0;
-		}
-		
 		filter();
 		for(i=0;i<M;i++) {
 			value[i]= GetVolt(After_filter[i]);
 			printf("value[%d]:%d.%dv\n",i,(int)value[i]/100,(int)value[i]%100) ;
 		delay_ms(100);
+		}
+		//温度、湿度
+		temp = Htu21D_read(HTU21_RD_TEMP);
+		temp=((long)17572)*temp;
+	    temp=temp/((long)65536);
+		temp =temp-((long)4685);
+		NumToStringForUsb((int)temp, 4, &USB_Frame[9]);
+		
+		humi = Htu21D_read(HTU21_RD_HUMI);
+		humi=((long)12500)*humi;
+		humi=humi/((long)65536);
+		humi =humi-((long)600);
+		NumToStringForUsb((int)humi, 4, &USB_Frame[13]);
+		
+		//PM2.5
+		USB_Frame[17] = '0'; USB_Frame[18] = '0'; USB_Frame[19] = '2';
+		
+		//照度值
+		NumToStringForUsb((int)value[0]*3, 4, &USB_Frame[20]);
+		
+		//微波监测
+		if((int)value[1] == 17)
+			USB_Frame[24] = '0';
+		else
+			USB_Frame[24] = '1';
+		
+		//报警器
+		USB_Frame[25] = '0'; USB_Frame[26] = '0';
+		
+		//VOC
+		NumToStringForUsb((int)value[2], 4, &USB_Frame[27]);
+		
+		//保留
+		USB_Frame[31] = '0'; USB_Frame[32] = '0';
+		USB_Frame[33] = '0'; USB_Frame[34] = '0';
+		
+		if(usb_cmd) {
+			printf("usb cmd %d\n\n", USB_DOWN[0] - '0');
+			IRDA_tx_data(skyworth[USB_DOWN[0] - '0'], SKY_WORTH_KEY_LEN);
+		    usb_cmd = 0;
 		}
 		
 		OledClearn();
@@ -120,7 +144,6 @@ void usb_port_set(u8 enable)
 		DisplayChar_16X08(0, 32,disp);
 		NumToString((int)humi/100, 2, disp);
 		DisplayChar_16X08(0, 80,disp);
-		
 		//显示亮度
 		NumToString((int)value[0]*3, 3, disp);
 		DisplayChar_16X08(2, 32,disp);

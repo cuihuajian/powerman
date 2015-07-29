@@ -162,12 +162,12 @@ void USB_Report_init(void)
     USB_Frame[5] = '5';
     USB_Frame[6] = '0';
 	USB_Frame[7] = '7';
-	for(j = 8 ; j < 35; j++) USB_Frame[j]= '0';
+	USB_Frame[8] = '+';
+	for(j = 9 ; j < 35; j++) USB_Frame[j]= '0';
 }
 
 void USB_Report(void)
 {   
-	
 	/* Copy mouse position info in ENDP1 Tx Packet Memory Area*/
 	USB_SIL_Write(EP1_IN, USB_Frame, 35); 
 	/* Enable endpoint for transmission */
