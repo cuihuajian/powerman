@@ -52,12 +52,14 @@ void EP1_IN_Callback(void)
   transfer has been complete */
   PrevXferComplete = 1; 
 }
-extern uint8_t USB_DOWN[2];
+extern uint8_t USB_DOWN[40];
 extern int usb_cmd;
 void EP2_OUT_Callback(void)
 {
-  u8 DataLen;
-  USB_DOWN[0] = 0;
+  u32 DataLen , i;
+  for(i = 0; i < 40; i ++)
+	USB_DOWN[i] = 0;
+	
   DataLen = GetEPRxCount(ENDP2);
   PMAToUserBufferCopy(USB_DOWN, ENDP2_RXADDR, DataLen);
   SetEPRxValid(ENDP2);

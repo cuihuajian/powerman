@@ -137,7 +137,7 @@ void USB_Interrupts_Config(void)
 * Return value  : None.
 *******************************************************************************/
 uint8_t USB_Frame[35];
-uint8_t USB_DOWN[2];
+uint8_t USB_DOWN[40];
 void Joystick_Send(u8 buf0,u8 buf1)
 {
 	uint8_t Mouse_Buffer[2] = {0, 0};

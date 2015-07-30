@@ -130,8 +130,10 @@ void usb_port_set(u8 enable)
 		USB_Frame[33] = '0'; USB_Frame[34] = '0';
 		
 		if(usb_cmd) {
-			printf("usb cmd %d\n\n", USB_DOWN[0] - '0');
-			IRDA_tx_data(skyworth[USB_DOWN[0] - '0'], SKY_WORTH_KEY_LEN);
+			if(USB_DOWN[8] != '*')
+				printf("voice \n");
+			if(USB_DOWN[10] != '*')
+				IRDA_tx_data(skyworth[USB_DOWN[17] - '0'], SKY_WORTH_KEY_LEN);
 		    usb_cmd = 0;
 		}
 		
