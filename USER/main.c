@@ -47,19 +47,19 @@ void usb_port_set(u8 enable)
 
  int main(void)
  {	
-	u16  value[M], i;
+	u16  value[M], i, j;
 	u8 disp[4];
 	Stm32_Clock_Init(9); //系统时钟设置
 	 
 	delay_init();	    	 //延时函数初始化	
     //NVIC_Configuration();//中断分组设置	 
-	uart_init(9600);	 	//串口初始化为9600
+	//uart_init(9600);	 	//串口初始化为9600
 	//delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
 	
 	I2C_EE_Init();//温度传感器
-	//VOICE_Init();
+	VOICE_Init();
 	
 	//红外控制器
 	IRDA_INIT();
@@ -83,7 +83,7 @@ void usb_port_set(u8 enable)
     Adc_Init();		   //ADC初始化	 
 	ADC_SoftwareStartConvCmd(ADC1, ENABLE);		//使能指定的ADC1的软件转换启动功能
 	DMA_Cmd(DMA1_Channel1, ENABLE);
-
+	
 	while(1)
 	{
 		delay_ms(1000);
@@ -91,7 +91,7 @@ void usb_port_set(u8 enable)
 		filter();
 		for(i=0;i<M;i++) {
 			value[i]= GetVolt(After_filter[i]);
-			printf("value[%d]:%d.%dv\n",i,(int)value[i]/100,(int)value[i]%100) ;
+			//printf("value[%d]:%d.%dv\n",i,(int)value[i]/100,(int)value[i]%100) ;
 		delay_ms(100);
 		}
 		//温度、湿度
@@ -132,10 +132,16 @@ void usb_port_set(u8 enable)
 		USB_Frame[33] = '0'; USB_Frame[34] = '0';
 		
 		if(usb_cmd) {
-			if(USB_DOWN[8] != '*')
-				printf("voice \n");
-			if(USB_DOWN[10] != '*')
-				IRDA_tx_data(skyworth[USB_DOWN[17] - '0'], SKY_WORTH_KEY_LEN);
+			if(USB_DOWN[8] != '*') {
+				i = USB_DOWN[8] - '0'; 
+				j = USB_DOWN[9] - '0';
+				Send_oneline(10 * i + j);
+			}
+			if(USB_DOWN[10] != '*') {
+				i = USB_DOWN[16] - '0'; 
+				j = USB_DOWN[17] - '0';
+				IRDA_tx_data(skyworth[10 * i + j], SKY_WORTH_KEY_LEN);
+			}
 		    usb_cmd = 0;
 		}
 		
@@ -152,7 +158,7 @@ void usb_port_set(u8 enable)
 		NumToString((int)value[0]*3, 3, disp);
 		DisplayChar_16X08(2, 32,disp);
 		
-		printf("light %d\n\n", (int)value[0]*3);
+		//printf("light %d\n\n", (int)value[0]*3);
 
 		USB_Report();
 	}
