@@ -114,13 +114,15 @@ void usb_port_set(u8 enable)
 		NumToStringForUsb((int)value[0]*3, 4, &USB_Frame[20]);
 		
 		//微波监测
-		if((int)value[1] == 17)
+		if((int)value[1] < 16)
 			USB_Frame[24] = '0';
 		else
 			USB_Frame[24] = '1';
 		
 		//报警器
-		USB_Frame[25] = '0'; USB_Frame[26] = '0';
+		USB_Frame[25] = USB_Frame[26] = '0'; 
+		if(PBin(8) == 0) USB_Frame[25] = '1'; 
+		if(PBin(9) == 0) USB_Frame[26] = '1';
 		
 		//VOC
 		NumToStringForUsb((int)value[2], 4, &USB_Frame[27]);
