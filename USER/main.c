@@ -44,6 +44,21 @@ void usb_port_set(u8 enable)
 		PAout(12)=0;	    		  
 	}
 }  	 
+extern u8 USART_RX_V[4];
+//电量采集
+void Att7035bu_Read(void){
+	u8 Read_cmd[2];
+	u8 i;
+	
+	Read_cmd[0] = 0x6A;
+	Read_cmd[1] = 0x1B;
+	
+	for( i = 0; i < 2; i++) {
+		USART_SendData(USART2, Read_cmd[i]);
+		while( USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET );
+	}
+}
+
 
  int main(void)
  {	
@@ -54,10 +69,11 @@ void usb_port_set(u8 enable)
 	delay_init();	    	 //延时函数初始化	
     //NVIC_Configuration();//中断分组设置	 
 	//uart_init(9600);	 	//串口初始化为9600
+	uart2_init(9600);	
 	//delay_ms(1800);
 
 	OLED_Init();			//初始化液晶 
-	
+
 	I2C_EE_Init();//温度传感器
 	VOICE_Init();
 	
@@ -87,13 +103,16 @@ void usb_port_set(u8 enable)
 	while(1)
 	{
 		delay_ms(1000);
-		
+	    
+		Att7035bu_Read();	
 		filter();
+		
 		for(i=0;i<M;i++) {
 			value[i]= GetVolt(After_filter[i]);
 			//printf("value[%d]:%d.%dv\n",i,(int)value[i]/100,(int)value[i]%100) ;
 		delay_ms(100);
 		}
+		
 		//温度、湿度
 		temp = Htu21D_read(HTU21_RD_TEMP);
 		temp=((long)17572)*temp;
@@ -114,7 +133,7 @@ void usb_port_set(u8 enable)
 		NumToStringForUsb((int)value[0]*3, 4, &USB_Frame[20]);
 		
 		//微波监测
-		if((int)value[1] < 16)
+		if((int)value[1] < 160 && (int)value[1] > 120)
 			USB_Frame[24] = '0';
 		else
 			USB_Frame[24] = '1';
@@ -158,7 +177,7 @@ void usb_port_set(u8 enable)
 		NumToString((int)value[0]*3, 3, disp);
 		DisplayChar_16X08(2, 32,disp);
 		
-		//printf("light %d\n\n", (int)value[0]*3);
+		//printf("ligh %s\n\n", USART_RX_V);
 
 		USB_Report();
 	}
